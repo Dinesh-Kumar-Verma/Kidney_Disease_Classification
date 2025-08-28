@@ -1,3 +1,4 @@
+import os
 from cnnClassifier.config.configuration import ConfigurationManager
 from cnnClassifier.utils.data_splitter import split_data
 from cnnClassifier import logger
