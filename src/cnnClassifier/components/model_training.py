@@ -2,7 +2,7 @@ import os
 import urllib.request as request
 from zipfile import ZipFile
 import tensorflow as tf
-tf.config.experimental_run_functions_eagerly(True)
+tf.config.run_functions_eagerly(True)
 import time
 from pathlib import Path
 from cnnClassifier.entity.config_entity import TrainingConfig

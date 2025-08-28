@@ -57,4 +57,4 @@ class Evaluation:
             mlflow.log_metrics(
                 {"loss": self.score[0], "accuracy": self.score[1]}
             )
-            mlflow.keras.log_model(self.model, "model")
+            mlflow.keras.log_model(self.model, name="model")

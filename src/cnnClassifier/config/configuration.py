@@ -99,7 +99,7 @@ class ConfigurationManager:
     def get_evaluation_config(self) -> EvaluationConfig:
         data_splitting = self.config.data_splitting
         eval_config = EvaluationConfig(
-            path_of_model="artifacts/training/model.h5",
+            path_of_model="artifacts/training/model.keras",
             test_dir=Path(os.path.join(data_splitting.root_dir, "test")),
             all_params=self.params,
             params_image_size=self.params.IMAGE_SIZE,
