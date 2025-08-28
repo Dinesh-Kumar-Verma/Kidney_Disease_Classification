@@ -3,11 +3,12 @@ import os
 from cnnClassifier.utils.common import read_yaml, create_directories,save_json
 from cnnClassifier.entity.config_entity import (
     DataIngestionConfig,
+    DataSplittingConfig,
     PrepareBaseModelConfig,
     TrainingConfig, 
     EvaluationConfig
     )
-
+from pathlib import Path
 
 
 class ConfigurationManager:
@@ -36,6 +37,21 @@ class ConfigurationManager:
         )
 
         return data_ingestion_config
+
+    def get_data_splitting_config(self) -> DataSplittingConfig:
+        config = self.config.data_splitting
+
+        create_directories([config.root_dir])
+
+        data_splitting_config = DataSplittingConfig(
+            root_dir=Path(config.root_dir),
+            source_data_dir=Path(config.source_data_dir),
+            train_dir=Path(os.path.join(config.root_dir, "train")),
+            valid_dir=Path(os.path.join(config.root_dir, "valid")),
+            test_dir=Path(os.path.join(config.root_dir, "test")),
+        )
+
+        return data_splitting_config
     
 
     def get_prepare_base_model_config(self) -> PrepareBaseModelConfig:
@@ -59,8 +75,8 @@ class ConfigurationManager:
     def get_training_config(self) -> TrainingConfig:
         training = self.config.training
         prepare_base_model = self.config.prepare_base_model
+        data_splitting = self.config.data_splitting
         params = self.params
-        training_data = os.path.join(self.config.data_ingestion.unzip_dir, "kidney-ct-scan-image")
         create_directories([
             Path(training.root_dir)
         ])
@@ -69,7 +85,8 @@ class ConfigurationManager:
             root_dir=Path(training.root_dir),
             trained_model_path=Path(training.trained_model_path),
             updated_base_model_path=Path(prepare_base_model.updated_base_model_path),
-            training_data=Path(training_data),
+            train_dir=Path(os.path.join(data_splitting.root_dir, "train")),
+            valid_dir=Path(os.path.join(data_splitting.root_dir, "valid")),
             params_epochs=params.EPOCHS,
             params_batch_size=params.BATCH_SIZE,
             params_is_augmentation=params.AUGMENTATION,
@@ -80,9 +97,10 @@ class ConfigurationManager:
         return training_config
     
     def get_evaluation_config(self) -> EvaluationConfig:
+        data_splitting = self.config.data_splitting
         eval_config = EvaluationConfig(
             path_of_model="artifacts/training/model.h5",
-            training_data="artifacts/data_ingestion/kidney-ct-scan-image",
+            test_dir=Path(os.path.join(data_splitting.root_dir, "test")),
             all_params=self.params,
             params_image_size=self.params.IMAGE_SIZE,
             params_batch_size=self.params.BATCH_SIZE

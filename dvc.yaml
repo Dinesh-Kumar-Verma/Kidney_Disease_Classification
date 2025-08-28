@@ -5,7 +5,17 @@ stages:
       - src/cnnClassifier/pipeline/stage_01_data_ingestion.py
       - config/config.yaml
     outs:
-      - artifacts/data_ingestion/kidney-ct-scan-image
+      - artifacts/data_ingestion/CT-KIDNEY-DATASET-Normal-Cyst-Tumor-Stone
+
+  data_splitting:
+    cmd: python src/cnnClassifier/pipeline/stage_05_data_splitting.py
+    deps:
+      - src/cnnClassifier/pipeline/stage_05_data_splitting.py
+      - src/cnnClassifier/utils/data_splitter.py
+      - config/config.yaml
+      - artifacts/data_ingestion/CT-KIDNEY-DATASET-Normal-Cyst-Tumor-Stone
+    outs:
+      - artifacts/data_split
 
   prepare_base_model:
     cmd: python src/cnnClassifier/pipeline/stage_02_prepare_base_model.py
@@ -26,13 +36,12 @@ stages:
     deps:
       - src/cnnClassifier/pipeline/stage_03_model_training.py
       - config/config.yaml
-      - artifacts/data_ingestion/kidney-ct-scan-image
+      - artifacts/data_split
       - artifacts/prepare_base_model
     params:
       - IMAGE_SIZE
       - EPOCHS
       - BATCH_SIZE
-
       - AUGMENTATION
       - LEARNING_RATE
     outs:
@@ -43,7 +52,7 @@ stages:
     deps:
       - src/cnnClassifier/pipeline/stage_04_model_evaluation.py
       - config/config.yaml
-      - artifacts/data_ingestion/kidney-ct-scan-image
+      - artifacts/data_split
       - artifacts/training/model.h5
     params:
       - IMAGE_SIZE

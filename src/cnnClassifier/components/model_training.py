@@ -14,20 +14,13 @@ class Training:
 
     
     def get_base_model(self):
-        self.model = tf.keras.models.load_model(self.config.updated_base_model_path)
-
-        self.model.compile(
-            optimizer=tf.keras.optimizers.SGD(learning_rate=self.config.params_learning_rate),
-            loss=tf.keras.losses.CategoricalCrossentropy(),
-            metrics=["accuracy"]
+        self.model = tf.keras.models.load_model(
+            self.config.updated_base_model_path
         )
 
-
     def train_valid_generator(self):
-
         datagenerator_kwargs = dict(
-            rescale = 1./255,
-            validation_split=0.20
+            rescale = 1./255
         )
 
         dataflow_kwargs = dict(
@@ -41,8 +34,7 @@ class Training:
         )
 
         self.valid_generator = valid_datagenerator.flow_from_directory(
-            directory=self.config.training_data,
-            subset="validation",
+            directory=self.config.valid_dir,
             shuffle=False,
             **dataflow_kwargs
         )
@@ -58,11 +50,12 @@ class Training:
                 **datagenerator_kwargs
             )
         else:
-            train_datagenerator = valid_datagenerator
+            train_datagenerator = tf.keras.preprocessing.image.ImageDataGenerator(
+                **datagenerator_kwargs
+            )
 
         self.train_generator = train_datagenerator.flow_from_directory(
-            directory=self.config.training_data,
-            subset="training",
+            directory=self.config.train_dir,
             shuffle=True,
             **dataflow_kwargs
         )

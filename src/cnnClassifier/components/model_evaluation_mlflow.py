@@ -12,11 +12,10 @@ class Evaluation:
         self.config = config
 
     
-    def _valid_generator(self):
+    def _test_generator(self):
 
         datagenerator_kwargs = dict(
-            rescale = 1./255,
-            validation_split=0.30
+            rescale = 1./255
         )
 
         dataflow_kwargs = dict(
@@ -25,13 +24,12 @@ class Evaluation:
             interpolation="bilinear"
         )
 
-        valid_datagenerator = tf.keras.preprocessing.image.ImageDataGenerator(
+        test_datagenerator = tf.keras.preprocessing.image.ImageDataGenerator(
             **datagenerator_kwargs
         )
 
-        self.valid_generator = valid_datagenerator.flow_from_directory(
-            directory=self.config.training_data,
-            subset="validation",
+        self.test_generator = test_datagenerator.flow_from_directory(
+            directory=self.config.test_dir,
             shuffle=False,
             **dataflow_kwargs
         )
@@ -44,8 +42,8 @@ class Evaluation:
 
     def evaluation(self):
         self.model = self.load_model(self.config.path_of_model)
-        self._valid_generator()
-        self.score = self.model.evaluate(self.valid_generator)
+        self._test_generator()
+        self.score = self.model.evaluate(self.test_generator)
         self.save_score()
 
     def save_score(self):
