@@ -18,6 +18,12 @@ class Training:
             self.config.updated_base_model_path
         )
 
+        self.model.compile(
+            optimizer=tf.keras.optimizers.SGD(learning_rate=self.config.params_learning_rate),
+            loss=tf.keras.losses.CategoricalCrossentropy(),
+            metrics=["accuracy"]
+        )
+
     def train_valid_generator(self):
         datagenerator_kwargs = dict(
             rescale = 1./255
